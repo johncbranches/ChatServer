@@ -38,6 +38,12 @@ public class Server {
             System.out.println("Couldn't connect to port");
         }
         System.out.println("You can now ask clients to join in!");
+        try {
+        System.out.println("The current host is " + InetAddress.getLocalHost()
+        .toString().split("/")[1]);
+        } catch (Exception e) {
+        	System.out.println("Could't get the current host.");
+        }
         while (true) {
             try {
 

@@ -1,119 +1,123 @@
 package org.academiadecodigo.bootcamp;
 
 import java.io.*;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Scanner;
 
 public class Client1 {
-    private String HOST = "127.0.0.1";
-    private final int PORT = 55555;
-    private BufferedReader breader = null;
-    private BufferedWriter bwriter = null;
-    private String username;
-    private int userId;
+	private String HOST = "127.0.0.1";
+	private final int PORT = 55555;
+	private BufferedReader breader = null;
+	private BufferedWriter bwriter = null;
+	private String username;
+	private int userId;
 
-    public void start() {
-        Socket clientSocket = null;
-        Scanner scanner = new Scanner(System.in);
+	public void start() {
+		Socket clientSocket = null;
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Type the address that appears on your server console.");
+        HOST = scanner.nextLine();
+		try {
 
-        try {
+			clientSocket = new Socket(HOST, PORT);
+			bwriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+			breader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            clientSocket = new Socket(HOST, PORT);
+			bwriter.write("Request userId");
+			bwriter.newLine();
+			bwriter.flush();
 
-            bwriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            breader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			userId = Integer.parseInt(breader.readLine());
 
-            bwriter.write("Request userId");
-            bwriter.newLine();
-            bwriter.flush();
+			// Starting chat
+			Thread thread = new Thread(new ClientWorker());
+			thread.start();
 
-           userId = Integer.parseInt(breader.readLine());
+		} catch (Exception e) {
+			System.out.println("Either you need to run the server first, or no server was"
+					+ " found at that specified address.");
+			System.exit(1);
+		}
 
-            //Starting chat
-            Thread thread = new Thread(new ClientWorker());
-            thread.start();
+		try {
+			String message;
+			boolean beginning = true;
 
-        } catch (Exception e) {
-            System.out.println("You need to run the server first");
-            e.printStackTrace();
-        }
+			while (true) {
+				if (beginning) {
+					message = "/alias";
+					beginning = false;
+				} else {
+					message = scanner.nextLine();
+				}
+				switch (message) {
+				case ("/quit"):
+					System.exit(0);
+					break;
 
-        try {
-            String message;
-            boolean beginning= true;
+				case ("/help"):
+					System.out.println("Controls:");
+					System.out.println("/help  show all commands");
+					System.out.println("/list  shows all users in the chat");
+					System.out.println("/alias  allows the user to change his username");
+					System.out.println("/quit  ends this username's chat");
+					break;
+				default:
 
-            while (true) {
-                if (beginning){
-                    message = "/alias";
-                    beginning = false;
-                } else {
-                    message = scanner.nextLine();
-                }
-                switch (message) {
-                    case ("/quit"):
-                        System.exit(0);
-                        break;
+					bwriter.write(message);
+					bwriter.newLine();
+					bwriter.flush();
+					break;
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("Couldn't send message.");
+			System.exit(1);
+		} finally {
+			close(clientSocket);
+		}
 
-                    case ("/help"):
-                        System.out.println("Controls:");
-                        System.out.println("/help  show all commands");
-                        System.out.println("/list  shows all users in the chat");
-                        System.out.println("/alias  allows the user to change his username");
-                        System.out.println("/quit  ends this username's chat");
-                        break;
-                    default:
+	}
 
-                        bwriter.write(message);
-                        bwriter.newLine();
-                        bwriter.flush();
-                        break;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Couldn't send message.");
-            System.exit(1);
-        } finally {
-            close(clientSocket);
-        }
+	private void close(Socket socket) {
+		if (socket == null) {
+			return;
+		}
+		try {
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("There was a problem closing the socket");
+		}
+	}
 
-    }
+	// Class ClientWorker
+	private class ClientWorker implements Runnable {
 
-    private void close(Socket socket) {
-        if (socket == null) {
-            return;
-        }
-        try {
-            socket.close();
-        } catch (IOException e) {
-            System.out.println("There was a problem closing the socket");
-        }
-    }
+		@Override
+		public void run() {
 
-    //Class ClientWorker
-    private class ClientWorker implements Runnable {
+			String message1 = null;
 
+			while (true) {
+				try {
+					message1 = breader.readLine();
+					if (message1 == null) {
+						System.exit(0);
+					}
 
-        @Override
-        public void run() {
+				} catch (Exception e) {
+					System.out.println("Couldn't read message");
+					System.exit(1);
+				}
 
-            String message1 = null;
+				System.out.println(message1);
 
-            while (true) {
-                try {
-                    message1 = breader.readLine();
-                    if (message1 == null) {
-                        System.exit(0);
-                    }
-
-                } catch (Exception e) {
-                    System.out.println("Couldn't read message");
-                    System.exit(1);
-                }
-
-                System.out.println(message1);
-
-
-            }
-        }
-    }
+			}
+		}
+	}
 }
