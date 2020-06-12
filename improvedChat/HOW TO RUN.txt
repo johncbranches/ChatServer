@@ -1,14 +1,18 @@
 You will need JDK> 9 to run this program.
 
-1. Run the server jar in your terminal:
-(In the directory of the jar file) java -jar LocalNetworkChat-Server.jar
+1. Run the server jar "LocalNetworkChat-Server.jar" in your terminal:
+ java -jar LocalNetworkChat-Server.jar
+(be sure you are on the folder with this file before running)
 
-2. Run the client jar in another terminal window:
-(In the directory of the jar file) java -jar LocalNetworkChat-Client.jar
+2. Run the client jar "LocalNetworkChat-Client.jar" in another terminal window:
+ java -jar LocalNetworkChat-Client.jar
 
-3. For an enhanced experience, run at least one more client jar
+3. For an enhanced experience, run at least one more client jar in another terminal window
 
 4. Start chatting in the clients
 
 5. Type /help and press enter (in one of the clients) for a small 
 surprise.
+
+Fun fact: You can run the client jar in multiple computers, as long as they are 
+in the same network, and chat with various users at the same time.

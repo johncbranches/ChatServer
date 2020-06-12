@@ -10,29 +10,27 @@ import java.util.Enumeration;
 import java.util.Scanner;
 
 public class Client1 {
+
 	private String HOST = "127.0.0.1";
 	private final int PORT = 55555;
+	private Socket clientSocket = null;
 	private BufferedReader breader = null;
 	private BufferedWriter bwriter = null;
-	private String username;
-	private int userId;
+	private Scanner scanner = new Scanner(System.in);
 
 	public void start() {
-		Socket clientSocket = null;
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Type the address that appears on your server console.");
-        HOST = scanner.nextLine();
+	
+		
+		System.out.println("Type the host that appears on your server console.");
+		System.out.println("It should be similar to     192.168.1.69");
+        
+		HOST = scanner.nextLine();
+		
 		try {
 
 			clientSocket = new Socket(HOST, PORT);
 			bwriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
 			breader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-			bwriter.write("Request userId");
-			bwriter.newLine();
-			bwriter.flush();
-
-			userId = Integer.parseInt(breader.readLine());
 
 			// Starting chat
 			Thread thread = new Thread(new ClientWorker());
@@ -47,8 +45,10 @@ public class Client1 {
 		try {
 			String message;
 			boolean beginning = true;
-
+			
 			while (true) {
+				// assigning the name to the user using Strategy design pattern 
+				//, class Alias.
 				if (beginning) {
 					message = "/alias";
 					beginning = false;
@@ -76,22 +76,23 @@ public class Client1 {
 				}
 			}
 		} catch (IOException e) {
-			System.out.println("Couldn't send message.");
+			System.out.println("The server seems to have been disconnected.");
 			System.exit(1);
 		} finally {
-			close(clientSocket);
+			close();
 		}
 
 	}
 
-	private void close(Socket socket) {
-		if (socket == null) {
+	private void close() {
+		if (clientSocket == null) {
 			return;
 		}
 		try {
-			socket.close();
+			clientSocket.close();
+			scanner.close();
 		} catch (IOException e) {
-			System.out.println("There was a problem closing the socket");
+			System.out.println("There was a problem closing the socket.");
 		}
 	}
 
@@ -107,11 +108,13 @@ public class Client1 {
 				try {
 					message1 = breader.readLine();
 					if (message1 == null) {
+						close();
 						System.exit(0);
 					}
 
 				} catch (Exception e) {
-					System.out.println("Couldn't read message");
+					System.out.println("The server was disconnected.");
+					close();
 					System.exit(1);
 				}
 

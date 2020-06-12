@@ -10,13 +10,12 @@ public class Alias implements SendStrategy{
     private Map<Integer, BufferedWriter> buWriter;
     private Map<Integer, BufferedReader> buReader;
     private Map<Integer, Socket> sockets;
-    private Block block = Block.getBlock();
 
     @Override
-    public void send(Server.ServerWorker Get, int userId, String message) {
-        buWriter = Get.getBuWriter();
-        buReader = Get.getBuReader();
-        sockets = Get.getSockets();
+    public void send(Server.ServerWorker server, int userId, String message) {
+        buWriter = server.getBuWriter();
+        buReader = server.getBuReader();
+        sockets = server.getSockets();
 
         BufferedWriter bwriter = buWriter.get(userId);
         BufferedReader breader = buReader.get(userId);
@@ -27,7 +26,8 @@ public class Alias implements SendStrategy{
         boolean validUsername = false;
 
             while (!validUsername) {
-                bwriter.write("Type the new username:");
+                
+            	bwriter.write("Type the new username:");
                 bwriter.newLine();
                 bwriter.flush();
 
@@ -35,31 +35,23 @@ public class Alias implements SendStrategy{
                 newUsername = newUsername.trim();
 
                 //Check if username exists
-                if (Get.checkName(userId, newUsername)) {
+                if (server.checkName(userId, newUsername)) {
                     validUsername = true;
                 } else {
                     bwriter.write("That username is taken. Please type a different one");
                     bwriter.newLine();
                     bwriter.flush();
                 }
-
-
-
             }
+            
             bwriter.write("Your username was successfully updated. You can chat now.");
             bwriter.newLine();
             bwriter.flush();
-
-
-
-
-
 
         } catch (IOException e) {
             System.out.println("Couldn't send or receive information.");
         }
 
-        Get.setUsername(newUsername);
-
+        server.setUsername(newUsername);
     }
 }

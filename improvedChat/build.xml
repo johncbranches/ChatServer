@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 
-<project name="LocalNetworkChat-Client" default="jarfile">
+<project name="LocalNetworkChat-Server" default="jarfile">
 
     <!-- Initialize build properties  -->
     <target name="init" description="Initializes properties">
-        <property name="project.name" value="LocalNetworkChat-Client" />
+        <property name="project.name" value="LocalNetworkChat-Server" />
         <property name="src.dir" value="src" />
-        <property name="main.class" value="org.academiadecodigo.bootcamp.ClientMain" />
+        <property name="main.class" value="org.academiadecodigo.bootcamp.ServerMain" />
         <property name="build.dir" value="build" />
         <property name="classes.dir" value="../build/classes" />
     </target>
